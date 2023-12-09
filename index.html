@@ -65,14 +65,14 @@
                   </div>
 
                   <div class="is-size-5 publication-authors">
-                    <span class="author-block">University of Surrey<br>Under review. 2023</span>
+                    <span class="author-block">University of Surrey<br>December, 2023</span>
                   </div>
 
                   <div class="column has-text-centered">
                     <div class="publication-links">
                          <!-- Arxiv PDF link -->
                       <span class="link-block">
-                        <a href="https://arxiv.org/pdf/<ARXIV PAPER ID>.pdf" target="_blank"
+                        <a href="https://arxiv.org/abs/2312.03154" target="_blank"
                         class="external-link button is-normal is-rounded is-dark">
                         <span class="icon">
                           <i class="fas fa-file-pdf"></i>
@@ -92,14 +92,13 @@
                   </a>
                 </span>
 
-                <!-- ArXiv abstract Link -->
                 <span class="link-block">
-                  <a href="https://arxiv.org/abs/<ARXIV PAPER ID>" target="_blank"
+                  <a href="https://arxiv.org/abs/2312.03154" target="_blank"
                   class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                     <i class="ai ai-arxiv"></i>
                   </span>
-                  <span>arXiv</span>
+                  <span>Demo (expiring link)</span>
                 </a>
               </span>
             </div>
@@ -115,10 +114,13 @@
 <section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
-      <span><b>TL;DR: </b>We add visual prompt to ControlNet and enable interpolation with text prompt. This allows many visual effects such as image stylization, pose transfer, clothing virtual try-on, DeepFakes, visual interpolation. This avoid mode collapse suffered by ControlNet and T2I-Adapter. All trained with a single GPU. </span>
-      <img src="static/images/visconet.png"alt="MY ALT TEXT"/>
+      <span><b>TL;DR: </b>We add visual prompt to ControlNet. By adjusting the control strength and different spatial resolutions, our method harmonizes between visual and text prompt, avoiding mode collapse suffered by ControlNet and T2I-Adapter and achieve various image tasks. All trained with small dataset on a single GPU. </span>
+      <video poster="" id="tree" autoplay controls muted loop height="100%">
+        <!-- Your video here -->
+        <source src="static/videos/visconet_banner_full.mp4"
+        type="video/mp4">
+      </video>
       <h2 class="subtitle has-text-centered">
-        Our method adds visual prompt to ControlNet, and also harmonize the influence between visual and text prompts. 
       </h2>
     </div>
   </div>
@@ -133,7 +135,27 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            This paper introduces ViscoNet, a novel method that enhances text-to-image human generation models with visual prompting. Unlike existing methods that rely on lengthy text descriptions to control the image structure, ViscoNet allows users to specify the visual appearance of the target object with a reference image. ViscoNet disentangles the object’s appearance from the image background and injects it into a pre-trained latent diffusion model (LDM) model via a ControlNet branch. This way, ViscoNet mitigates the style mode collapse problem and enables precise and flexible visual control. We demonstrate the effectiveness of ViscoNet on human image generation, where it can manipulate visual attributes and artistic styles with text and image prompts. We also show that ViscoNet can learn visual conditioning from small and specific object domains while preserving the generative power of the LDM backbone.
+            This paper introduces ViscoNet, a novel method that enhances text-to-image human generation models with visual prompting. Unlike existing methods that rely on lengthy text descriptions to control the image structure, ViscoNet allows users to specify the visual appearance of the target object with a reference image. ViscoNet disentangles the object’s appearance from the image background and injects it into a pre-trained latent diffusion model (LDM) model via a ControlNet branch. This way, ViscoNet mitigates the style mode collapse problem and enables precise and flexible visual control. We demonstrate the effectiveness of ViscoNet on human image generation, where it can manipulate visual attributes and artistic styles by adjusting the control strength of visual prompt at different spatial resolutions. We also show that ViscoNet can learn visual conditioning from small and specific object domains while preserving the generative power of the LDM backbone.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+<!-- Method -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Method</h2>
+        <div class="container">
+          <img src="static/images/visconet.png"alt="MY ALT TEXT"/>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            We replaces text embedding in ControlNet with image embedding. This severes the entanglement between ControlNet and backbone LDM (StableDiffusion). We applies human masking to control signals to avoid overfitting LDM with blank background of small training dataset.  
           </p>
         </div>
       </div>
@@ -143,20 +165,36 @@
 <!-- End paper abstract -->
 
 <section class="hero is-small">
-  <h2 class="title is-3">Latent Space Interpolation</h2>
   <div class="hero-body">
     <div class="container">
-      <img src="static/images/interpolate.png"alt="MY ALT TEXT"/>
-      ViscoNet adds visual prompt to human pose ControlNet. Our novel method allows adjustment of influence between text and visual prompt, resulting effect of latent space interpolation. Figure (a) visual prompt transition smoothly towards text prompt in (h) by reducing the control signal strength.
+      <h2 class="title is-3">Latent Space Interpolation</h2>    
+      <div class="row">
+        <div class="col">
+        <img src="static/images/sculpture.gif"alt="MY ALT TEXT"/>
+        </div>
+        <div class="col">
+          <img src="static/images/tomcruise.gif"alt="MY ALT TEXT"/>
+        </div>        
+      </div>
+      <div class="row">
+        <div class="col">
+          <img src="static/images/woman_ukiyoe.gif"alt="MY ALT TEXT"/>
+          </div>        
+        <div class="col">
+        <img src="static/images/age2.gif"alt="MY ALT TEXT"/>
+        <p>Fixing visual prompt and change age in text prompt.</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
 <!-- Image carousel -->
-<section class="hero is-small">
-  <h2 class="title is-3">DeepFakes, Virtual Try-on, Pose Transfer</h2>
+<section class="hero is-small">  
   <div class="hero-body">
     <div class="container">
+      <h2 class="title is-3">DeepFakes, Virtual Try-on, Pose Transfer</h2>
       <div id="results-carousel" class="carousel results-carousel">
         <div class="item">
           <!-- Your image here -->
@@ -201,10 +239,17 @@
 
 <!-- Image carousel -->
 <section class="hero is-small">
-  <h2 class="title is-3">Styelization</h2>
   <div class="hero-body">
     <div class="container">
+      <h2 class="title is-3">Styelization</h2>
+      <p> We avoid mode collapse by reducing the visual control signal strength. We remove the face visual prompt in some challenging image styles.</p>      
       <div id="results-carousel" class="carousel results-carousel">
+        <div class="item">
+          <!-- Your image here -->
+          <img src="static/images/banner.jpg" alt="MY ALT TEXT"/>
+          <h2 class="subtitle has-text-centered">
+          </h2>
+        </div>        
         <div class="item">
           <!-- Your image here -->
           <img src="static/images/style1.png" alt="MY ALT TEXT"/>
@@ -214,12 +259,6 @@
        <div class="item">
         <!-- Your image here -->
         <img src="static/images/style2.png" alt="MY ALT TEXT"/>
-        <h2 class="subtitle has-text-centered">
-        </h2>
-      </div>
-      <div class="item">
-        <!-- Your image here -->
-        <img src="static/images/banner.png" alt="MY ALT TEXT"/>
         <h2 class="subtitle has-text-centered">
         </h2>
       </div>
@@ -236,31 +275,43 @@
 <!-- End image carousel -->
 
 
+<!-- Image carousel -->
 <section class="hero is-small">
-  <h2 class="title is-3">Aging Visual Effects</h2>
   <div class="hero-body">
     <div class="container">
-      <img src="static/images/age2.gif"alt="MY ALT TEXT"/>
-      <br>
-      <h2 class="subtitle has-text-centered"></h2>
-      Create aging effect by changing the age in text prompt while fixing the pose and visual prompts.
-    </div>
+      <h2 class="title is-3">Texture Transfer</h2>
+      <p> We achieve texture transfer by only applying visual control signals at high spatial resolutions.</p>      
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item">
+          <!-- Your image here -->
+          <img src="static/images/9_texture_transfer.jpg" alt="MY ALT TEXT"/>
+          <h2 class="subtitle has-text-centered">
+          </h2>
+        </div>        
+        <div class="item">
+          <!-- Your image here -->
+          <img src="static/images/9_texture_transfer_2.jpg" alt="MY ALT TEXT"/>
+          <h2 class="subtitle has-text-centered">
+         </h2>
+       </div>        
   </div>
+</div>
+</div>
 </section>
-
+<!-- End image carousel -->
 
 <!-- Youtube video -->
 <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
       <!-- Paper video. -->
-      <h2 class="title is-3">Video Presentation</h2>
+      <h2 class="title is-3">Video Tutorial</h2>
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
           
           <div class="publication-video">
             <!-- Youtube embed code here -->
-            <iframe src="https://www.youtube.com/embed/JkaxUblCGz0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/85NyIuLeV00" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           </div>
         </div>
       </div>
@@ -268,7 +319,6 @@
   </div>
 </section>
 <!-- End youtube video -->
-
 
 
 
@@ -280,9 +330,9 @@
         @InProceedings{cheong2023visconet,
         author    = {Cheong, Soon Yau and Mustafa, Armin and Gilbert, Andrew},
         title     = {ViscoNet: Bridging and Harmonizing Visual and Textual Conditioning for ControlNet},
-        booktitle = {Arxiv Preprint},
+        journal = {Arxiv Preprint 2312.03154},
         month     = {December},
-        year      = {2023},</code></pre>
+        year      = {2023}}</code></pre>
     </div>
 </section>
 <!--End BibTex citation -->
