@@ -144,7 +144,19 @@ body {
 
 /* Clear floats after image containers */
 .row::after {
+  display: flex;
   content: "";
   clear: both;
   display: table;
+}
+
+.column1 {
+  float: left;
+  flex: 1;
+  padding: 5px;
+}
+
+.column2 {
+  flex: 2;
+  padding: 5px;
 }
