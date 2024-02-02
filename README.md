@@ -1,7 +1,7 @@
 ## *ViscoNet*: Bridging and Harmonizing Visual and Textual Conditioning for ControlNet
 [Soon Yau Cheong](https://scholar.google.com/citations?user=dRot7GUAAAAJ&hl=en)
 [Armin Mustafa](https://scholar.google.com/citations?user=0xOHqkMAAAAJ&hl=en)
-[Andrew Gilber](https://scholar.google.com/citations?user=NNhnVwoAAAAJ&hl=en)
+[Andrew Gilbert](https://scholar.google.com/citations?user=NNhnVwoAAAAJ&hl=en)
 
 
 <a href='https://soon-yau.github.io/visconet/'><img src='https://img.shields.io/badge/Project-Page-Green'></a> 
