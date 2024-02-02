@@ -34,7 +34,7 @@ All model and data files are in [here](https://huggingface.co/soonyau/visconet/t
 Including eval.zip containing all images used in human evaluation.
 
 ### Gradio App
-![App](./assets/app.png)
+[![App](./assets/app.png)](https://youtu.be/3_6Zq3hk86Q)
 1. Download *visconet_v1.pth* and *exp-schp-201908301523-atr.pth* into directory ./models
 2. (Optional) download fashion.zip and unzip it to home directory. 
 3. run ```python gradio_visconet.py```
