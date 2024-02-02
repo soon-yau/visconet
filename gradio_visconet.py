@@ -25,8 +25,8 @@ from ldm.util import instantiate_from_config, log_txt_as_img
 from visconet.segm import ATRSegmentCropper as SegmentCropper
 
 # supply  directory of visual prompt images
-WOMEN_GALLERY_PATH = '/home/soon/datasets/deepfashion_inshop/styles_default/WOMEN'
-MEN_GALLERY_PATH = '/home/soon/datasets/deepfashion_inshop/styles_default/MEN'
+WOMEN_GALLERY_PATH = './fashion/WOMEN'
+MEN_GALLERY_PATH = './fashion/MEN'
 
 DEMO = True
 LOG_SAMPLES = True
