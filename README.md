@@ -10,18 +10,6 @@
 
 https://github.com/soon-yau/visconet/assets/19167278/ae58b7ab-fa76-4253-8a10-46656f234b20
 
-
-
-
-### Citation
-```
-@article{cheong2023visconet,
-        author    = {Cheong, Soon Yau and Mustafa, Armin and Gilbert, Andrew},
-        title     = {ViscoNet: Bridging and Harmonizing Visual and Textual Conditioning for ControlNet},
-        journal = {Arxiv Preprint 2312.03154},
-        month     = {December},
-        year      = {2023}}
-```
 ### Requirements
 A suitable [conda](https://conda.io/) environment named `control` can be created
 and activated with:
@@ -38,3 +26,13 @@ Including eval.zip containing all images used in human evaluation.
 1. Download *visconet_v1.pth* and *exp-schp-201908301523-atr.pth* into directory ./models
 2. (Optional) download fashion.zip and unzip it to home directory. 
 3. run ```python gradio_visconet.py```
+
+### Citation
+```
+@article{cheong2023visconet,
+        author    = {Cheong, Soon Yau and Mustafa, Armin and Gilbert, Andrew},
+        title     = {ViscoNet: Bridging and Harmonizing Visual and Textual Conditioning for ControlNet},
+        journal = {Arxiv Preprint 2312.03154},
+        month     = {December},
+        year      = {2023}}
+```
