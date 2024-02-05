@@ -23,10 +23,13 @@ from PIL import Image
 from omegaconf import OmegaConf
 from ldm.util import instantiate_from_config, log_txt_as_img
 from visconet.segm import ATRSegmentCropper as SegmentCropper
+from huggingface_hub import snapshot_download
 
 # supply  directory of visual prompt images
-WOMEN_GALLERY_PATH = './fashion/WOMEN'
-MEN_GALLERY_PATH = './fashion/MEN'
+HF_REPO = 'soonyau/visconet'
+GALLERY_PATH = Path('./fashion/')
+WOMEN_GALLERY_PATH = GALLERY_PATH/'WOMEN'
+MEN_GALLERY_PATH = GALLERY_PATH/'MEN'
 
 DEMO = True
 LOG_SAMPLES = True
@@ -60,7 +63,7 @@ SCALE_CONFIG = {
                 0.0,0.0,0,0]
     }
 DEFAULT_SCALE_CONFIG = 'Default'
-
+ignore_style_list = ['headwear', 'accesories', 'shoes']
 
 global device
 global segmentor
@@ -160,7 +163,7 @@ def extract_fashion(input_image):
     cropped = segmentor(input_image)
     cropped_images = []
     for style_name in style_names:
-        if style_name in cropped:
+        if style_name in cropped and style_name not in ignore_style_list:
             cropped_images.append(cropped[style_name])
         else:
             cropped_images.append(None)
@@ -309,7 +312,7 @@ def create_app():
                         viscon_images_names2index = {}
                         viscon_len = len(style_names)
                         v_idx = 0
-                        ignore_style_list = ['headwear', 'accesories', 'shoes']
+                        
                         with gr.Row():
                             for _ in range(8):
                                 viscon_name = style_names[v_idx]
@@ -433,10 +436,9 @@ if __name__ == "__main__":
     global model
     global ddim_sampler    
 
-    device = f'cuda:{args.gpu}'
+    device = f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu'
     config_file = args.config
     model_ckpt = args.ckpt
-
 
     proj_config = OmegaConf.load(config_file)
     style_names = proj_config.dataset.train.params.style_names
@@ -449,15 +451,25 @@ if __name__ == "__main__":
     segmentor = SegmentCropper()
     apply_openpose = OpenposeDetector()
 
+    snapshot_download(repo_id=HF_REPO, local_dir='./models',
+                      allow_patterns=os.path.basename(model_ckpt))
+
     style_encoder = instantiate_from_config(proj_config.model.style_embedding_config).to(device)
-    model = create_model(config_file).cpu()
+    model = create_model(config_file).cpu()    
     model.load_state_dict(load_state_dict(model_ckpt, location=device))
 
-    #torch.save(model.state_dict(), 'models/visconet_v1.pth')
     model = model.to(device)
     model.cond_stage_model.device = device
     ddim_sampler = DDIMSampler(model)
 
+    if not GALLERY_PATH.exists():
+        zip_name = 'fashion.zip'
+        snapshot_download(repo_id=HF_REPO, allow_patterns=zip_name, local_dir='.')
+        from zipfile import ZipFile
+        with ZipFile(zip_name, 'r') as zip_ref:
+            zip_ref.extractall('.')
+        os.remove(zip_name)
+    
     # Calling the main function with parsed arguments
     block = create_app()
     block.launch(server_name='0.0.0.0', share=args.public_link)
