@@ -11,6 +11,8 @@ import torchvision.transforms as T
 
 from .transforms import transform_logits, get_affine_transform
 from . import networks
+from annotator.util import annotator_ckpts_path
+from huggingface_hub import snapshot_download
 
 dataset_settings = {
     'lip': {
@@ -61,16 +63,19 @@ class Segmentator(torch.nn.Module):
     def __init__(self, dataset='lip'):
         super().__init__()
 
-        if dataset == 'atr':
-            model_path='models/exp-schp-201908301523-atr.pth'
-        elif dataset == 'lip':
-            model_path='models/exp-schp-201908261155-lip.pth'
-
         num_classes = dataset_settings[dataset]['num_classes']
         input_size = dataset_settings[dataset]['input_size']
         label = dataset_settings[dataset]['label']
 
-        assert os.path.exists(model_path)
+        if dataset == 'atr':
+            model_path='exp-schp-201908301523-atr.pth'
+        elif dataset == 'lip':
+            model_path='exp-schp-201908261155-lip.pth'
+        
+        model_path = os.path.join(annotator_ckpts_path, model_path)
+
+        snapshot_download(repo_id="soonyau/visconet", allow_patterns="exp-schp-201908301523-atr.pth", local_dir=annotator_ckpts_path)
+
         self.model = networks.init_model('resnet101', num_classes=num_classes, pretrained=None)
         state_dict = torch.load(model_path)['state_dict']
         from collections import OrderedDict
