@@ -50,8 +50,10 @@ def main(args):
     proj_name = args.name
     max_epochs = args.max_epochs
     batch_size = args.batch_size
+    num_gpus = len(gpus)
+    num_workers = num_gpus * batch_size
 
-    logdir = os.path.join('./lightning_logs/', proj_name)
+    logdir = os.path.join('./logs/', proj_name)
 
     if resume_path == '':
         resume_path = DEFAULT_CKPT
@@ -60,7 +62,7 @@ def main(args):
         reset_crossattn = False
 
     logger_freq = 1000
-    learning_rate = (batch_size / 4) * 5e-5
+    learning_rate = num_gpus * (batch_size / 4) * 5e-5
     sd_locked = True
     only_mid_control = False
     
@@ -87,8 +89,8 @@ def main(args):
     # data
     dataset = instantiate_from_config(config.dataset.train)
     val_dataset = instantiate_from_config(config.dataset.val)
-    dataloader = DataLoader(dataset, num_workers=batch_size, batch_size=batch_size, shuffle=True)
-    val_dataloader = DataLoader(val_dataset, num_workers=batch_size, batch_size=batch_size, shuffle=False)
+    dataloader = DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
+    val_dataloader = DataLoader(val_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=False)
     
     # callbacks
     logger = ImageLogger(batch_frequency=logger_freq)
@@ -100,10 +102,8 @@ def main(args):
     lr_monitor_cb = LearningRateMonitor(logging_interval='step')
     callbacks = [logger, save_cb, setup_cb, lr_monitor_cb]
 
-    # trainer = pl.Trainer(strategy="ddp", accelerator="gpu", devices=2, precision=32, callbacks=[logger], 
-    #                     accumulate_grad_batches=4)
-
-    trainer = pl.Trainer(accelerator="gpu", devices=gpus, 
+    strategy = "ddp" if num_gpus > 1 else "auto"
+    trainer = pl.Trainer(accelerator="gpu", devices=gpus, strategy=strategy,
                         precision=32, callbacks=callbacks, 
                         accumulate_grad_batches=4,
                         default_root_dir=logdir,

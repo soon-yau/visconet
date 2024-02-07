@@ -297,7 +297,7 @@ def create_app():
                             male_pose_gallery = gr.Gallery(label='pose', show_label=False, value=samples).style(grid=3, height='auto')                        
                     with gr.Row():
                         #pad_checkbox = gr.Checkbox(label='Pad pose to square', value=True)
-                        ignorehead_checkbox = gr.Checkbox(label='Ignore face in masking (for DeepFake)', value=True)
+                        ignorehead_checkbox = gr.Checkbox(label='Ignore face in masking (for faceswap with text)', value=False)
                         ignorehair_checkbox = gr.Checkbox(label='Ignore hair in masking', value=False, visible=True)
                     with gr.Row():
                         #ignore_head_checkbox = gr.Checkbox(label='Ignore head', value=False)
@@ -327,17 +327,16 @@ def create_app():
 
                     with gr.Column():
                         with gr.Accordion("Female", open=False):
-                            for garment, number in zip(['hair', 'top', 'bottom', 'outer'], [150, 500, 500, 250]):
+                            for garment, number in zip(['face', 'hair', 'top', 'bottom', 'outer'], [50, 150, 500, 500, 250]):
                                 with gr.Tab(garment):
                                     samples = []
                                     if WOMEN_GALLERY_PATH and os.path.exists(WOMEN_GALLERY_PATH):
                                         samples = glob(os.path.join(WOMEN_GALLERY_PATH, f'**/{garment}.jpg'), recursive=True)
-                                        #samples = glob(f'/home/soon/datasets/deepfashion_inshop/styles_default/WOMEN/**/{garment}.jpg', recursive=True)
                                         samples = random.choices(samples, k=number)
                                     viscon_gallery = gr.Gallery(label='hair', allow_preview=False, show_label=False, value=samples).style(grid=4, height='auto')
                                     viscon_galleries.append({'component':viscon_gallery, 'inputs':[garment]})
                         with gr.Accordion("Male", open=False):
-                            for garment, number in zip(['hair', 'top', 'bottom', 'outer'], [150, 500, 500, 250]):
+                            for garment, number in zip(['face','hair', 'top', 'bottom', 'outer'], [50, 150, 500, 500, 250]):
                                 with gr.Tab(garment):
                                     samples = []
                                     if MEN_GALLERY_PATH and os.path.exists(MEN_GALLERY_PATH):
@@ -392,7 +391,7 @@ def create_app():
                         DF_DEMO = 'fashionWOMENTees_Tanksid0000762403_1front___fashionWOMENTees_Tanksid0000762403_1front'
                         DF_EVAL = 'fashionWOMENBlouses_Shirtsid0000035501_1front___fashionWOMENBlouses_Shirtsid0000035501_1front'
                         DF_RESULT ="fashionWOMENTees_Tanksid0000796209_1front___fashionWOMENTees_Tanksid0000796209_2side"                    
-                        deepfashion_names = gr.Textbox(label='Deepfashion name', value=DF_EVAL)         
+                        deepfashion_names = gr.Textbox(label='Deepfashion name', value=DF_EVAL)
                 gr.Markdown("Default config reconstruct image faithful to pose, mask and visual condition. Reduce control strength to tip balance towards text prompt for more creativity.")
                 prompt = gr.Textbox(label="Text Prompt", value="")
                 
@@ -421,7 +420,7 @@ def create_app():
     return block
     
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Calculate image-text similarity score.')
+    parser = argparse.ArgumentParser()
 
     parser.add_argument('--gpu', type=int, default=0, help='GPU id')
     parser.add_argument('--config', type=str, default='./configs/visconet_v1.yaml')
@@ -472,4 +471,4 @@ if __name__ == "__main__":
     
     # Calling the main function with parsed arguments
     block = create_app()
-    block.launch(server_name='0.0.0.0', share=args.public_link)
+    block.launch(share=args.public_link)
