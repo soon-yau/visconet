@@ -283,12 +283,12 @@ def create_app():
             gr.Markdown("## ViscoNet: Visual ControlNet with Human Pose and Fashion <br> [Video tutorial](https://youtu.be/85NyIuLeV00)")
         with gr.Row():
             with gr.Column():
-                with gr.Accordion("Get pose and mask", open=False):
+                with gr.Accordion("Get pose and mask", open=True):
                     with gr.Row():
                         input_image = gr.Image(source='upload', type="numpy", label='input image', value=np.array(get_image_numpy('ref')))
                         pose_image = gr.Image(source='upload', type="numpy", label='pose', value=np.array(get_image_numpy('pose')))
                         mask_image = gr.Image(source='upload', type="numpy", label='mask', value=np.array(get_image_numpy('mask')))
-                    with gr.Accordion("Samples", open=False):
+                    with gr.Accordion("Human Pose Samples", open=False):
                         with gr.Tab('Female'):
                             samples = get_image_files(str(SAMPLE_IMAGE_PATH/'pose/WOMEN/'))
                             female_pose_gallery = gr.Gallery(label='pose', show_label=False, value=samples).style(grid=3, height='auto')
@@ -305,7 +305,7 @@ def create_app():
                         get_fashion_button = gr.Button(label="Get visual", value='Get visual prompt')
                             
                 
-                with gr.Accordion("Visual Conditions", open=False):
+                with gr.Accordion("Visual Conditions", open=True):
                     gr.Markdown('Drag-and-drop, or click from samples below.')
                     with gr.Column():
                         viscon_images = []
@@ -325,67 +325,35 @@ def create_app():
 
                     viscon_galleries = []
 
-                    with gr.Column():
-                        with gr.Accordion("Female", open=False):
-                            for garment, number in zip(['face', 'hair', 'top', 'bottom', 'outer'], [50, 150, 500, 500, 250]):
-                                with gr.Tab(garment):
-                                    samples = []
-                                    if WOMEN_GALLERY_PATH and os.path.exists(WOMEN_GALLERY_PATH):
-                                        samples = glob(os.path.join(WOMEN_GALLERY_PATH, f'**/{garment}.jpg'), recursive=True)
-                                        samples = random.choices(samples, k=number)
-                                    viscon_gallery = gr.Gallery(label='hair', allow_preview=False, show_label=False, value=samples).style(grid=4, height='auto')
-                                    viscon_galleries.append({'component':viscon_gallery, 'inputs':[garment]})
-                        with gr.Accordion("Male", open=False):
-                            for garment, number in zip(['face','hair', 'top', 'bottom', 'outer'], [50, 150, 500, 500, 250]):
-                                with gr.Tab(garment):
-                                    samples = []
-                                    if MEN_GALLERY_PATH and os.path.exists(MEN_GALLERY_PATH):
-                                        samples = glob(os.path.join(MEN_GALLERY_PATH, f'**/{garment}.jpg'), recursive=True)
-                                        samples = random.choices(samples, k=number)
-                                    viscon_gallery = gr.Gallery(label='hair', allow_preview=False, show_label=False, value=samples).style(grid=4, height='auto')
-                                    viscon_galleries.append({'component':viscon_gallery, 'inputs':[garment]})
+                    with gr.Accordion("Virtual Try-on", open=False):
+                        with gr.Column():
+                            #with gr.Accordion("Female", open=False):
+                            with gr.Tab('Female'):
+                                for garment, number in zip(['face', 'hair', 'top', 'bottom', 'outer'], [50, 150, 500, 500, 250]):
+                                    with gr.Tab(garment):
+                                        samples = []
+                                        if WOMEN_GALLERY_PATH and os.path.exists(WOMEN_GALLERY_PATH):
+                                            samples = glob(os.path.join(WOMEN_GALLERY_PATH, f'**/{garment}.jpg'), recursive=True)
+                                            samples = random.choices(samples, k=number)
+                                        viscon_gallery = gr.Gallery(label='hair', allow_preview=False, show_label=False, value=samples).style(grid=4, height='auto')
+                                        viscon_galleries.append({'component':viscon_gallery, 'inputs':[garment]})
+                            #with gr.Accordion("Male", open=False):
+                            with gr.Tab('Male'):
+                                for garment, number in zip(['face','hair', 'top', 'bottom', 'outer'], [50, 150, 500, 500, 250]):
+                                    with gr.Tab(garment):
+                                        samples = []
+                                        if MEN_GALLERY_PATH and os.path.exists(MEN_GALLERY_PATH):
+                                            samples = glob(os.path.join(MEN_GALLERY_PATH, f'**/{garment}.jpg'), recursive=True)
+                                            samples = random.choices(samples, k=number)
+                                        viscon_gallery = gr.Gallery(label='hair', allow_preview=False, show_label=False, value=samples).style(grid=4, height='auto')
+                                        viscon_galleries.append({'component':viscon_gallery, 'inputs':[garment]})
 
-                with gr.Accordion("Control Strength Scaling", open=False):
-                    gr.Markdown("smaller value for stronger textual influence. c12 is highest spatial resolution controlling textures")
-                    with gr.Row():
-                        strength_select = gr.Dropdown(list(SCALE_CONFIG.keys()), label='strength settings', value=DEFAULT_SCALE_CONFIG)
-                        scale_all = gr.Slider(label=f'set all scales', minimum=0, maximum=1, value=DEFAULT_CONTROL_SCALE, step=0.05)
-                    scale_values = SCALE_CONFIG[DEFAULT_SCALE_CONFIG]
-                    control_scales = []
-                    c_idx = 12
-                    with gr.Accordion("Advanced settings", open=False):
-                        with gr.Row():
-                            for _ in range(3):
-                                control_scales.append(gr.Slider(label=f'c{c_idx}', minimum=0, maximum=1, value=scale_values[12-c_idx], step=0.05))
-                                c_idx -= 1
-                        with gr.Row():
-                            for _ in range(3):
-                                control_scales.append(gr.Slider(label=f'c{c_idx}', minimum=0, maximum=1, value=scale_values[12-c_idx], step=0.05))
-                                c_idx -= 1
-                        with gr.Row():
-                            for _ in range(3):
-                                control_scales.append(gr.Slider(label=f'c{c_idx}', minimum=0, maximum=1, value=scale_values[12-c_idx], step=0.05))
-                                c_idx -= 1
-                        with gr.Row():
-                            for _ in range(4):
-                                control_scales.append(gr.Slider(label=f'c{c_idx}', minimum=0, maximum=1, value=scale_values[12-c_idx], step=0.05))
-                                c_idx -= 1
-
-                with gr.Accordion("Advanced options", open=False):
-                    with gr.Row():
-                        detect_resolution = gr.Slider(label="OpenPose Resolution", minimum=128, maximum=512, value=512, step=1)
-                        ddim_steps = gr.Slider(label="Steps", minimum=1, maximum=50, value=20, step=1)
-                        scale = gr.Slider(label="Guidance Scale", minimum=0.1, maximum=30.0, value=12.0, step=0.1)
-
-                    eta = gr.Number(label="eta (DDIM)", value=0.0, visible=False)
-                    a_prompt = gr.Textbox(label="Added Prompt", value='best quality, extremely detailed')
-                    n_prompt = gr.Textbox(label="Negative Prompt",
-                                        value='longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, sunglasses, hat')
             with gr.Column():
                 result_gallery = gr.Gallery(label='Output', show_label=False, show_download_button=True, elem_id="gallery").style(grid=1, height='auto')
                 with gr.Row():
                     max_samples = 8 if not DEMO else 4
                     num_samples = gr.Slider(label="Images", minimum=1, maximum=max_samples, value=1, step=1)
+                    scale_all = gr.Slider(label=f'Control Strength', minimum=0, maximum=1, value=DEFAULT_CONTROL_SCALE, step=0.05)
                     seed = gr.Slider(label="Seed (-1 for random)", minimum=-1, maximum=2147483647, step=1, value=1561194236)#randomize=True) #value=1561194234)                
                     if not DEMO:
                         DF_DEMO = 'fashionWOMENTees_Tanksid0000762403_1front___fashionWOMENTees_Tanksid0000762403_1front'
@@ -396,7 +364,39 @@ def create_app():
                 prompt = gr.Textbox(label="Text Prompt", value="")
                 
                 run_button = gr.Button(label="Run")
+                with gr.Accordion("Advanced options", open=False):
+                    with gr.Accordion("Control Strength Scaling", open=False):
+                        gr.Markdown("smaller value for stronger textual influence. c12 is highest spatial resolution controlling textures")
+                        strength_select = gr.Dropdown(list(SCALE_CONFIG.keys()), label='strength settings', value=DEFAULT_SCALE_CONFIG)                        
+                        scale_values = SCALE_CONFIG[DEFAULT_SCALE_CONFIG]
+                        control_scales = []
+                        c_idx = 12
+                        with gr.Accordion("Advanced settings", open=False):
+                            with gr.Row():
+                                for _ in range(3):
+                                    control_scales.append(gr.Slider(label=f'c{c_idx}', minimum=0, maximum=1, value=scale_values[12-c_idx], step=0.05))
+                                    c_idx -= 1
+                            with gr.Row():
+                                for _ in range(3):
+                                    control_scales.append(gr.Slider(label=f'c{c_idx}', minimum=0, maximum=1, value=scale_values[12-c_idx], step=0.05))
+                                    c_idx -= 1
+                            with gr.Row():
+                                for _ in range(3):
+                                    control_scales.append(gr.Slider(label=f'c{c_idx}', minimum=0, maximum=1, value=scale_values[12-c_idx], step=0.05))
+                                    c_idx -= 1
+                            with gr.Row():
+                                for _ in range(4):
+                                    control_scales.append(gr.Slider(label=f'c{c_idx}', minimum=0, maximum=1, value=scale_values[12-c_idx], step=0.05))
+                                    c_idx -= 1                    
+                    with gr.Row():
+                        detect_resolution = gr.Slider(label="OpenPose Resolution", minimum=128, maximum=512, value=512, step=1)
+                        ddim_steps = gr.Slider(label="Steps", minimum=1, maximum=50, value=20, step=1)
+                        scale = gr.Slider(label="Guidance Scale", minimum=0.1, maximum=30.0, value=12.0, step=0.1)
 
+                    eta = gr.Number(label="eta (DDIM)", value=0.0, visible=False)
+                    a_prompt = gr.Textbox(label="Added Prompt", value='best quality, extremely detailed')
+                    n_prompt = gr.Textbox(label="Negative Prompt",
+                                        value='longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, sunglasses, hat')
 
         female_pose_gallery.select(fn=select_gallery_image, inputs=None, outputs=input_image)
         male_pose_gallery.select(fn=select_gallery_image, inputs=None, outputs=input_image)
@@ -450,8 +450,9 @@ if __name__ == "__main__":
     segmentor = SegmentCropper()
     apply_openpose = OpenposeDetector()
 
-    snapshot_download(repo_id=HF_REPO, local_dir='./models',
-                      allow_patterns=os.path.basename(model_ckpt))
+    if not os.path.exists(model_ckpt):
+        snapshot_download(repo_id=HF_REPO, local_dir='./models',
+                        allow_patterns=os.path.basename(model_ckpt))
 
     style_encoder = instantiate_from_config(proj_config.model.style_embedding_config).to(device)
     model = create_model(config_file).cpu()    

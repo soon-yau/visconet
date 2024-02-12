@@ -34,7 +34,7 @@ def main(args):
     proj_name = args.name
     max_epochs = args.max_epochs
 
-    logdir = os.path.join('./lightning_logs/', proj_name)
+    logdir = os.path.join('./logs/', proj_name)
 
     if resume_path == '':
         resume_path = DEFAULT_CKPT
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, help='config file')
     parser.add_argument('--resume_path', type=str, default='')
     parser.add_argument('--gpus', nargs='+', type=int, default=[1])
-    parser.add_argument('--max_epochs', type=int, default=20)
+    parser.add_argument('--max_epochs', type=int, default=1)
     parser.add_argument('--batch_size', type=int, default=5)
     
     
