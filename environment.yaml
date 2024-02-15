@@ -12,7 +12,7 @@ dependencies:
   - numpy=1.23.1
   - ninja
   - pip:
-      - gradio==3.39.0
+      - gradio==3.46.0
       - albumentations==1.3.0
       - imageio==2.9.0
       - imageio-ffmpeg==0.4.2
