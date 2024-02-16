@@ -84,6 +84,8 @@ def fetch_deepfashion(deepfashion_names):
     return [input_image, pose_image, mask_image, *viscon_images]
 
 def select_gallery_image(evt: gr.SelectData):
+    import pdb
+    pdb.set_trace()
     return evt.target.value[evt.index]['name']
 
 def select_default_strength(strength_config):
@@ -451,4 +453,4 @@ if __name__ == "__main__":
     
     # Calling the main function with parsed arguments
     block = create_app()
-    block.launch(share=args.public_link)
+    block.launch(server_name="0.0.0.0", share=args.public_link)

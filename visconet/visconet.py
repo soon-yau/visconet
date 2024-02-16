@@ -225,7 +225,7 @@ class ViscoNetLDM(LatentDiffusion):
     def configure_optimizers(self):
         lr = self.learning_rate
         params = list(self.control_model.parameters())
-        params += list(self.control_cond_model.proj.parameters())
+        params += list(self.control_cond_model.parameters())
         if not self.sd_locked:
             params += list(self.model.diffusion_model.output_blocks.parameters())
             params += list(self.model.diffusion_model.out.parameters())

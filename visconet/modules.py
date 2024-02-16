@@ -3,6 +3,7 @@ import torch.nn as nn
 from functools import partial
 import clip
 from einops import rearrange, repeat
+import torch.nn.functional as F
 
 class LinearProj(nn.Module):
     """
@@ -47,6 +48,32 @@ class ProjectLocalStyle(nn.Module):
         return batch
 
 
+# class ProjectLocalStyleSoftmax(nn.Module):
+#     """
+#         Uses the CLIP image encoder.
+#         """
+#     def __init__(
+#             self,
+#             pool_size=8,
+#             local_emb_size=257,
+#         ):
+#         super().__init__()
+#         self.weights = nn.Parameter(torch.rand(local_emb_size, pool_size))            
+#         self.register_parameter("weights", self.weights)
+        
+#     def forward(self, x):
+#         weights = F.softmax(self.weights, dim=0)
+
+#         b, n, c, d = x.shape
+#         # reaarange [2, 8, 257, 1024] to [2, 8, 1024, 257]
+#         batch = rearrange(x, 'b n c d -> b n d c')
+#         # linear (257, 8) to create [2, 8, 1024, 8]
+#         batch = batch @ weights
+#         # reaarange [2, 8, 1024, 8] to [2, 8x8, 1024]
+#         b, n, c, p = batch.shape
+#         batch = rearrange(batch, 'b n c p -> b (n p) c')
+#         return batch
+    
 
 class ClipImageEncoder(nn.Module):
     """

@@ -60,7 +60,6 @@ class DeepFashionDataset(Loader):
                  style_dir,
                  mask_dir,
                  map_file,
-                 caption_file:None,
                  data_files:list,
                  dropout=None,
                  sample_ratio=None,
