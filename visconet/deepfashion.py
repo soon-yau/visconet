@@ -144,7 +144,7 @@ class DeepFashionDataset(Loader):
             target_path = str(self.pose_root/target.name)
             pose_image = self.skeleton_tform(Image.open(target_path))
 
-            prompt = 'a person. best quality, extremely detailed.'
+            prompt = 'a person.'
             mask = T.ToTensor()(Image.open(str(self.mask_root/target.name).replace('.jpg','_mask.png')))
             
             return dict(jpg=target_image, 
