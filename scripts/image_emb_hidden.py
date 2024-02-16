@@ -53,10 +53,10 @@ class ClipImageEncoder(nn.Module):
 if __name__ == '__main__':
     device = 'cuda:1'
     style_files = glob("/home/soon/datasets/deepfashion_inshop/styles_default/**/*.jpg", recursive=True)
-    style_files = [x for x in style_files if x.split('/')[-1]!='background.jpg']
+    #style_files = [x for x in style_files if x.split('/')[-1]!='background.jpg']
     clip_model = ClipImageEncoder().to(device)
 
-    for style_file in tqdm(style_files[24525:]):
+    for style_file in tqdm(style_files[:]):
         style_image = Image.open(style_file)
         emb_local, emb_global = clip_model(clip_model.preprocess(style_image).to(device))
         emb_local = clip_model.postprocess(emb_local)
@@ -64,9 +64,9 @@ if __name__ == '__main__':
         #x = torch.tensor(np.array(processor.image_processor(style_image).pixel_values))
         #emb = model(x.to(device)).last_hidden_state
         #emb = emb.detach().cpu().squeeze(0).numpy()
-        emb_file = style_file.replace('.jpg','_hidden.p')
+        emb_file = style_file.replace('.jpg','_hidden.p').replace('styles_default', 'styles_default_emb')
         with open(emb_file, 'wb') as file:
             pickle.dump(emb_local, file)    
-        emb_file = style_file.replace('.jpg','.p')
-        with open(emb_file, 'wb') as file:
-            pickle.dump(emb_global, file)    
+        # emb_file = style_file.replace('.jpg','.p')
+        # with open(emb_file, 'wb') as file:
+        #     pickle.dump(emb_global, file)    

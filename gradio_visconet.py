@@ -1,7 +1,6 @@
 from share import *
 import config
 import os
-import cv2
 import einops
 import gradio as gr
 import numpy as np
@@ -23,7 +22,9 @@ from PIL import Image
 from omegaconf import OmegaConf
 from ldm.util import instantiate_from_config, log_txt_as_img
 from visconet.segm import ATRSegmentCropper as SegmentCropper
+from visconet.deepfashion import DeepFashionDatasetNumpy
 from huggingface_hub import snapshot_download
+
 
 # supply  directory of visual prompt images
 HF_REPO = 'soonyau/visconet'
@@ -71,42 +72,20 @@ global apply_openpose
 global style_encoder
 global model
 global ddim_sampler
+global dataset
 
-def convert_fname(long_name):
-    gender = 'MEN' if long_name[7:10]  == 'MEN' else 'WOMEN'
-
-    input_list = long_name.replace('fashion','').split('___')
-    
-    # Define a regular expression pattern to match the relevant parts of each input string
-    if gender == 'MEN':
-        pattern = r'MEN(\w+)id(\d+)_(\d)(\w+)'
-    else:
-        pattern = r'WOMEN(\w+)id(\d+)_(\d)(\w+)'
-    # Use a list comprehension to extract the matching substrings from each input string, and format them into the desired output format
-    output_list = [f'{gender}/{category}/id_{id_num[:8]}/{id_num[8:]}_{view_num}_{view_desc}' for (category, id_num, view_num, view_desc) in re.findall(pattern, ' '.join(input_list))]
-
-    # Print the resulting list of formatted strings
-    return [f +'.jpg' for f in output_list]
 
 def fetch_deepfashion(deepfashion_names):
-    src_name, dst_name = convert_fname(deepfashion_names)
-    input_image = np.array(Image.open(image_root/src_name))
-    pose_image = np.array(Image.open(str(pose_root/dst_name)))
-    mask_image = Image.open(str(mask_root/dst_name).replace('.jpg','_mask.png'))
-
-    temp = src_name.replace('.jpg','').split('/')
-    lastfolder = temp.pop(-1).replace('_','/', 1)
-    style_folder = style_root/('/'.join(temp+[lastfolder]))
-    viscon_images = []
-    for style_name in style_names:
-        f_path = style_folder/f'{style_name}.jpg'
-        if os.path.exists(str(f_path)):
-            viscon_images.append(np.array(Image.open(f_path)))
-        else:
-            viscon_images.append(None)
+    sample = dataset.get(deepfashion_names)
+    input_image = sample['source_image']
+    pose_image = sample['pose_image']
+    mask_image = sample['mask_image']
+    viscon_images = [sample['viscon_image'][style_name] for style_name in style_names]
     return [input_image, pose_image, mask_image, *viscon_images]
 
 def select_gallery_image(evt: gr.SelectData):
+    import pdb
+    pdb.set_trace()
     return evt.target.value[evt.index]['name']
 
 def select_default_strength(strength_config):
@@ -314,7 +293,7 @@ def create_app():
                         v_idx = 0
                         
                         with gr.Row():
-                            for _ in range(8):
+                            for _ in range(len(style_names)):
                                 viscon_name = style_names[v_idx]
                                 vis = False if viscon_name in ignore_style_list else True
                                 viscon_images.append(gr.Image(source='upload', type="pil", min_height=112, min_width=112, label=viscon_name, value=get_image(viscon_name), visible=vis))
@@ -416,7 +395,8 @@ def create_app():
         strength_select.select(fn=select_default_strength, inputs=[strength_select], outputs=[*control_scales])
         scale_all.release(fn=change_all_scales, inputs=[scale_all], outputs=[*control_scales])
         if not DEMO:
-            deepfashion_names.submit(fn=fetch_deepfashion, inputs=[deepfashion_names], outputs=[input_image, pose_image, mask_image, *viscon_images])
+            deepfashion_names.submit(fn=fetch_deepfashion, inputs=[deepfashion_names], 
+                                     outputs=[input_image, pose_image, mask_image, *viscon_images])
     return block
     
 if __name__ == "__main__":
@@ -434,7 +414,7 @@ if __name__ == "__main__":
     global style_encoder
     global model
     global ddim_sampler    
-
+    global dataset
     device = f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu'
     config_file = args.config
     model_ckpt = args.ckpt
@@ -447,6 +427,7 @@ if __name__ == "__main__":
     pose_root = data_root/proj_config.dataset.train.params.pose_dir
     mask_root = data_root/proj_config.dataset.train.params.mask_dir
 
+    dataset = DeepFashionDatasetNumpy(**proj_config.dataset.val.params)
     segmentor = SegmentCropper()
     apply_openpose = OpenposeDetector()
 
@@ -472,4 +453,4 @@ if __name__ == "__main__":
     
     # Calling the main function with parsed arguments
     block = create_app()
-    block.launch(share=args.public_link)
+    block.launch(server_name="0.0.0.0", share=args.public_link)

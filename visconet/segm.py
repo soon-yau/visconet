@@ -8,13 +8,14 @@ from torchvision import transforms as T
 import torch
 from annotator.segm import Segmentator
 
-class SegmentCropper:
+class SegmentCropper(torch.nn.Module):
     def __init__(self, 
                  label_dict: dict, 
                  segm_groups: dict, 
                  image_transform,
                  feat_transform=None,
                  device=None):
+        super().__init__()
         self.image_transform = image_transform
         self.feat_transform = feat_transform
         self.device = device
@@ -137,11 +138,13 @@ class SegmentCropper:
         return cropped
     
     def __call__(self, image:np.array, segm:np.array=None, ignore_head=False, ignore_hair=False):
+        cropped_images =  OrderedDict()
 
         if segm == None:
-            segm = np.array(self.segmentator(image))
-        
-        cropped_images =  OrderedDict()
+            segm = self.segmentator(image)
+            cropped_images['segmap'] = segm.convert('RGB')
+            segm = np.array(segm)
+                            
         face_mask = torch.zeros(image.shape[:2], dtype=torch.bool).to(self.device)
         try:
             face = DeepFace.extract_faces(img_path=image[:,:,::-1], 
@@ -187,8 +190,6 @@ class SegmentCropper:
         cropped_images['human_mask'] = human_mask
         return cropped_images
     
-    def to(self, device):
-        self.segmentator = self.segmentator.to(device)
 
 class ATRSegmentCropper(SegmentCropper):
     def __init__(self, feat_transform=None, **kwargs):
@@ -211,27 +212,27 @@ class ATRSegmentCropper(SegmentCropper):
              15: 'Right-arm',
              16: 'Bag',
              17: 'Scarf'}
+        
         segm_groups = {
             'background':['Background'],
             'face':['Sunglasses','Face'],
             'hair':['Hair'],
             'headwear':['Hat'],
             'top':['Upper-clothes','Dress'],
-            #'outer':['Upper-clothes'],
             'bottom':['Skirt','Pants','Dress','Belt'],
             'shoes':['Left-shoe','Right-shoe'],
-            #'accesories':['Bag'],
+            'accesories':['Bag','Scarf'],
+            'limbs':['Left-leg','Right-leg', 'Left-arm', 'Right-arm']
             }        
             
         image_transform = T.Compose([
             T.ToPILImage(),
             T.Resize(size=224),
             T.CenterCrop(size=(224, 224))])
-        
-        self.segmentator = Segmentator('atr')
 
         super().__init__(label_dict, segm_groups, image_transform, feat_transform, **kwargs)
-
+        self.segmentator = Segmentator('atr')
+        
 class LipSegmentCropper(SegmentCropper):
     def __init__(self, feat_transform=None, **kwargs):
         label_dict = {
