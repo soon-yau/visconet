@@ -84,8 +84,6 @@ def fetch_deepfashion(deepfashion_names):
     return [input_image, pose_image, mask_image, *viscon_images]
 
 def select_gallery_image(evt: gr.SelectData):
-    import pdb
-    pdb.set_trace()
     return evt.target.value[evt.index]['name']
 
 def select_default_strength(strength_config):

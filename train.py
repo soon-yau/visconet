@@ -124,8 +124,8 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, help='config file')
     parser.add_argument('--resume_path', type=str, default='')
     parser.add_argument('--gpus', nargs='+', type=int, default=[1])
-    parser.add_argument('--max_epochs', type=int, default=20)
-    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--max_epochs', type=int, default=5)
+    parser.add_argument('--batch_size', type=int, default=3)
     # Parsing arguments
     args = parser.parse_args()
 
