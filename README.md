@@ -27,10 +27,10 @@ run ```python gradio_visconet.py```
 
 ### Citation
 ```
-@article{cheong2023visconet,
+@inproceedings{visconet,
         author    = {Cheong, Soon Yau and Mustafa, Armin and Gilbert, Andrew},
         title     = {ViscoNet: Bridging and Harmonizing Visual and Textual Conditioning for ControlNet},
-        journal = {Arxiv Preprint 2312.03154},
-        month     = {December},
-        year      = {2023}}
+        booktitle = {ECCV Workshop Proceedings}
+        month     = {September},
+        year      = {2024}}
 ```
